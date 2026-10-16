@@ -1,0 +1,21 @@
+{
+  "name": "royal-heights-school",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --webpack",
+    "build": "next build",
+    "start": "next start",
+    "db:sync": "node scripts/sync-neon.mjs"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.2.0",
+    "bcryptjs": "^3.0.3",
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest"
+  },
+  "optionalDependencies": {
+    "@next/swc-wasm-nodejs": "^16.4.2"
+  }
+}
