@@ -54,6 +54,7 @@ function PortalContent() {
   const [role, setRole] = useState(urlRole || 'admin');
   const [activePage, setActivePage] = useState(urlTab || 'dashboard');
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
 
   // Parent Multi-Child State
   const [activeParentChildIndex, setActiveParentChildIndex] = useState(
@@ -107,11 +108,9 @@ function PortalContent() {
     }, 3800);
   };
 
-  // Handle Logout & Portal Locking
-  const handleLogout = async () => {
-    try {
-      await fetch('/api/auth/logout', { method: 'POST' });
-    } catch (e) {}
+  // Handle Logout & Portal Locking (Instantaneous & Non-Blocking)
+  const handleLogout = () => {
+    // 1. Immediately wipe client credentials & storage for instant security
     if (typeof window !== 'undefined') {
       localStorage.removeItem('rh_auth_token');
       localStorage.removeItem('rh_user');
@@ -119,10 +118,12 @@ function PortalContent() {
       localStorage.removeItem('rh_portal_tab');
       localStorage.removeItem('rh_portal_child');
     }
-    showToast('Securely signed out. Locking workstation...');
-    setTimeout(() => {
-      router.push('/login');
-    }, 500);
+
+    // 2. Clear server-side session cookie in background without blocking navigation
+    fetch('/api/auth/logout', { method: 'POST', keepalive: true }).catch(() => {});
+
+    // 3. Immediately transition to login page
+    router.replace('/login');
   };
 
   // Restore session and verify authentication token
@@ -132,6 +133,13 @@ function PortalContent() {
       const savedTab = localStorage.getItem('rh_portal_tab');
       const savedChild = localStorage.getItem('rh_portal_child');
       const token = localStorage.getItem('rh_auth_token');
+      const savedUserStr = localStorage.getItem('rh_user');
+
+      if (savedUserStr) {
+        try {
+          setCurrentUser(JSON.parse(savedUserStr));
+        } catch (_) {}
+      }
 
       // Verify session via /api/auth/me
       fetch('/api/auth/me', {
@@ -140,6 +148,7 @@ function PortalContent() {
         .then((res) => res.json())
         .then((data) => {
           if (data.authenticated && data.user) {
+            setCurrentUser(data.user);
             if (!urlRole && data.user.role) setRole(data.user.role);
           }
         })
@@ -520,6 +529,7 @@ function PortalContent() {
         isMobileOpen={isMobileOpen}
         onCloseMobile={() => setIsMobileOpen(false)}
         onLogout={handleLogout}
+        currentUser={currentUser}
       />
 
       {/* Mobile Drawer Backdrop */}
@@ -539,6 +549,7 @@ function PortalContent() {
           onSwitchView={handleReturnToWebsite}
           onToggleMobileMenu={() => setIsMobileOpen((prev) => !prev)}
           onLogout={handleLogout}
+          currentUser={currentUser}
         />
 
         {/* Portal Content Body */}

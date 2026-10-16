@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
@@ -74,6 +74,11 @@ function LoginContent() {
   const [errorMessage, setErrorMessage] = useState('');
   const [showDemoDrawer, setShowDemoDrawer] = useState(false);
 
+  // Prefetch portal page on load for instant navigation
+  useEffect(() => {
+    router.prefetch('/portal');
+  }, [router]);
+
   // Update identifier when switching role tab
   const handleSelectRole = (newRole) => {
     setSelectedRole(newRole);
@@ -112,10 +117,8 @@ function LoginContent() {
             localStorage.setItem('rh_portal_child', '0');
           }
         }
-        setToastMessage(`Verified! Redirecting to ${DEMO_PROFILES[data.user.role || selectedRole].title}...`);
-        setTimeout(() => {
-          router.push(`/portal?role=${data.user.role || selectedRole}&tab=dashboard`);
-        }, 400);
+        setToastMessage(`Verified! Entering ${DEMO_PROFILES[data.user.role || selectedRole].title}...`);
+        router.push(`/portal?role=${data.user.role || selectedRole}&tab=dashboard`);
       } else {
         setIsLoading(false);
         setErrorMessage(data.error || 'Invalid credentials. Please verify your password.');

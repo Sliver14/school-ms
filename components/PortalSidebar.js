@@ -48,9 +48,13 @@ export default function PortalSidebar({
   isMobileOpen,
   onCloseMobile,
   onLogout,
+  currentUser,
 }) {
   const roleConfig = ROLE_PERMISSIONS[role] || ROLE_PERMISSIONS.admin;
   const allowedPages = roleConfig?.tabs || [];
+  const userName = currentUser?.name || roleConfig?.name;
+  const userAvatar = currentUser?.avatar || roleConfig?.avatar || 'RH';
+  const roleSub = roleConfig?.sub || (role ? role.toUpperCase() : 'PORTAL USER');
 
   return (
     <aside className={`sidebar ${isMobileOpen ? 'open' : ''}`} id="sidebar">
@@ -124,11 +128,11 @@ export default function PortalSidebar({
       <div className="sidebar-user-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div className="sidebar-avatar" id="sidebarAvatar">
-            {roleConfig.avatar || 'RH'}
+            {userAvatar}
           </div>
           <div className="sidebar-user-info">
-            <strong id="sidebarUserName">{roleConfig.name}</strong>
-            <small id="sidebarRoleDesc">{roleConfig.sub}</small>
+            <strong id="sidebarUserName">{userName}</strong>
+            <small id="sidebarRoleDesc">{roleSub}</small>
           </div>
         </div>
         {onLogout && (
