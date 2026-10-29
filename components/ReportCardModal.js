@@ -213,7 +213,7 @@ export default function ReportCardModal({
           </div>
 
           {/* Pastoral & Endorsement Blocks */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '14px', marginBottom: '20px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))', gap: '14px', marginBottom: '20px' }}>
             <div style={{ background: 'var(--surface2)', padding: '12px 14px', borderRadius: '8px', border: '1px solid var(--line)' }}>
               <div style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', color: 'var(--gold-600)', marginBottom: '6px' }}>
                 Form Teacher's Pastoral Remark

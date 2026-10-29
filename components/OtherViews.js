@@ -2,7 +2,10 @@
 import { useState } from 'react';
 
 export function TimetableModule({ role }) {
+  const [activeDay, setActiveDay] = useState('Monday');
   const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+  const dayKey = activeDay.slice(0, 3).toLowerCase(); // 'mon', 'tue', 'wed', 'thu', 'fri'
+
   const periods = [
     { time: '08:00 - 09:20', mon: 'Mathematics', tue: 'Physics', wed: 'Chemistry', thu: 'Further Maths', fri: 'Biology' },
     { time: '09:30 - 10:50', mon: 'English Lang', tue: 'Chemistry', wed: 'Biology', thu: 'Chemistry Practical', fri: 'English Literature' },
@@ -19,8 +22,9 @@ export function TimetableModule({ role }) {
         </div>
       </div>
 
-      <div className="panel">
-        <div style={{ overflowX: 'auto' }}>
+      <div className="panel" style={{ padding: 0 }}>
+        {/* DESKTOP VIEW: Full 5-day table on tablets/desktops (>= 769px) */}
+        <div className="desktop-only table-wrap" style={{ margin: 0, padding: '0 4px 12px' }}>
           <table className="data-table">
             <thead>
               <tr>
@@ -43,6 +47,40 @@ export function TimetableModule({ role }) {
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* MOBILE VIEW: Interactive Day Switcher + Period Cards (<= 768px, Zero Horizontal Scroll) */}
+        <div className="mobile-only" style={{ padding: '14px' }}>
+          <div className="mobile-day-tabs">
+            {days.map((d) => (
+              <button
+                key={d}
+                type="button"
+                className={`mobile-day-tab-btn ${activeDay === d ? 'active' : ''}`}
+                onClick={() => setActiveDay(d)}
+              >
+                {d.slice(0, 3)}
+              </button>
+            ))}
+          </div>
+
+          <div className="mobile-cards-list">
+            {periods.map((p, idx) => (
+              <div key={idx} className="mobile-card" style={{ padding: '12px 14px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                  <div>
+                    <span style={{ fontSize: '11px', color: 'var(--muted)', fontWeight: '700', textTransform: 'uppercase' }}>
+                      Period {idx + 1}
+                    </span>
+                    <div style={{ fontSize: '14.5px', fontWeight: '700', color: 'var(--ink)', marginTop: '2px' }}>
+                      {p[dayKey]}
+                    </div>
+                  </div>
+                  <span className="badge badge-primary">{p.time}</span>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
@@ -90,8 +128,8 @@ export function AttendanceModule({ role, attendanceList = [], onOpenAttendanceMo
         </div>
       </div>
 
-      <div className="panel">
-        <div className="panel-head">
+      <div className="panel" style={{ padding: 0 }}>
+        <div className="panel-head" style={{ padding: '20px 20px 0' }}>
           <div className="panel-title">
             <div className="panel-icon">✅</div>
             <div>
@@ -105,7 +143,9 @@ export function AttendanceModule({ role, attendanceList = [], onOpenAttendanceMo
             </button>
           )}
         </div>
-        <div className="table-wrap">
+
+        {/* DESKTOP VIEW: Attendance Table (>= 769px) */}
+        <div className="desktop-only table-wrap" style={{ margin: 0, padding: '0 4px 12px' }}>
           <table className="data-table">
             <thead>
               <tr>
@@ -145,6 +185,48 @@ export function AttendanceModule({ role, attendanceList = [], onOpenAttendanceMo
             </tbody>
           </table>
         </div>
+
+        {/* MOBILE VIEW: Attendance Responsive Cards (<= 768px, Zero Horizontal Scroll) */}
+        <div className="mobile-only mobile-cards-list" style={{ padding: '14px' }}>
+          {displayList.map((row, idx) => (
+            <div key={idx} className="mobile-card">
+              <div className="mobile-card-head">
+                <div>
+                  <h4 className="mobile-card-title">{row.studentName || 'Daniel Adeyemi'}</h4>
+                  <div className="mobile-card-sub">{row.date}</div>
+                </div>
+                <span
+                  className={`badge ${
+                    row.status === 'Present'
+                      ? 'badge-success'
+                      : row.status === 'Late'
+                      ? 'badge-gold'
+                      : row.status === 'Excused'
+                      ? 'badge-primary'
+                      : 'badge-danger'
+                  }`}
+                >
+                  {row.status}
+                </span>
+              </div>
+
+              <div className="mobile-card-grid">
+                <div className="mobile-card-field">
+                  <span className="mobile-card-label">Roll Call Period</span>
+                  <span className="mobile-card-value">{row.period || 'Morning Roll Call'}</span>
+                </div>
+                <div className="mobile-card-field">
+                  <span className="mobile-card-label">Host Teacher</span>
+                  <span className="mobile-card-value">{row.hostTeacher || 'Mr. Samuel Okoro'}</span>
+                </div>
+                <div className="mobile-card-field full">
+                  <span className="mobile-card-label">Teacher Remark</span>
+                  <span className="mobile-card-value">{row.remark || 'Punctual'}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -163,8 +245,8 @@ export function AdmissionsModule({ admissions = [], onOpenFastAdmission, onRevie
         </button>
       </div>
 
-      <div className="panel">
-        <div className="panel-head">
+      <div className="panel" style={{ padding: 0 }}>
+        <div className="panel-head" style={{ padding: '20px 20px 0' }}>
           <div className="panel-title">
             <div className="panel-icon">📝</div>
             <div>
@@ -173,7 +255,9 @@ export function AdmissionsModule({ admissions = [], onOpenFastAdmission, onRevie
             </div>
           </div>
         </div>
-        <div className="table-wrap">
+
+        {/* DESKTOP VIEW: Admissions Table (>= 769px) */}
+        <div className="desktop-only table-wrap" style={{ margin: 0, padding: '0 4px 12px' }}>
           <table className="data-table">
             <thead>
               <tr>
@@ -238,6 +322,65 @@ export function AdmissionsModule({ admissions = [], onOpenFastAdmission, onRevie
             </tbody>
           </table>
         </div>
+
+        {/* MOBILE VIEW: Admissions Responsive Cards (<= 768px, Zero Horizontal Scroll) */}
+        <div className="mobile-only mobile-cards-list" style={{ padding: '14px' }}>
+          {admissions.map((applicant) => (
+            <div key={applicant.id} className="mobile-card">
+              <div className="mobile-card-head">
+                <div>
+                  <h4 className="mobile-card-title">{applicant.name}</h4>
+                  <div className="mobile-card-sub">Ref: {applicant.id}</div>
+                </div>
+                <span className="badge badge-primary">{applicant.entryClass}</span>
+              </div>
+
+              <div className="mobile-card-grid">
+                <div className="mobile-card-field">
+                  <span className="mobile-card-label">Parent / Sponsor</span>
+                  <span className="mobile-card-value">{applicant.parentName}</span>
+                </div>
+                <div className="mobile-card-field">
+                  <span className="mobile-card-label">Contact Phone</span>
+                  <a href={`tel:${applicant.parentPhone}`} className="mobile-card-value" style={{ color: 'var(--sky)' }}>
+                    {applicant.parentPhone}
+                  </a>
+                </div>
+                <div className="mobile-card-field">
+                  <span className="mobile-card-label">CBT Score</span>
+                  <span className="mobile-card-value" style={{ color: 'var(--gold-400)', fontWeight: '800' }}>
+                    {applicant.score ? `${applicant.score}%` : 'Pending'}
+                  </span>
+                </div>
+                <div className="mobile-card-field">
+                  <span className="mobile-card-label">Decision</span>
+                  <span
+                    className={`badge ${
+                      applicant.decision?.includes('Enrolled') || applicant.decision === 'Accepted'
+                        ? 'badge-success'
+                        : applicant.decision === 'Under Review'
+                        ? 'badge-primary'
+                        : 'badge-gold'
+                    }`}
+                    style={{ alignSelf: 'flex-start', marginTop: '2px', fontSize: '11px' }}
+                  >
+                    {applicant.decision}
+                  </span>
+                </div>
+              </div>
+
+              <div className="mobile-card-actions">
+                <button
+                  className="btn secondary small"
+                  style={{ width: '100%' }}
+                  onClick={() => onReviewApplicant(applicant)}
+                >
+                  {applicant.decision?.includes('Enrolled') ? 'View Applicant Record' : 'Review & Enrol Scholar →'}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -253,8 +396,9 @@ export function ParentsModule() {
         </div>
       </div>
 
-      <div className="panel">
-        <div className="table-wrap">
+      <div className="panel" style={{ padding: 0 }}>
+        {/* DESKTOP VIEW: Parents Table (>= 769px) */}
+        <div className="desktop-only table-wrap" style={{ margin: 0, padding: '0 4px 12px' }}>
           <table className="data-table">
             <thead>
               <tr>
@@ -292,6 +436,103 @@ export function ParentsModule() {
               </tr>
             </tbody>
           </table>
+        </div>
+
+        {/* MOBILE VIEW: Parents Responsive Cards (<= 768px, Zero Horizontal Scroll) */}
+        <div className="mobile-only mobile-cards-list" style={{ padding: '14px' }}>
+          <div className="mobile-card">
+            <div className="mobile-card-head">
+              <div>
+                <h4 className="mobile-card-title">Dr. & Mrs. Adeleke</h4>
+                <div className="mobile-card-sub">Family ID: FAM-2026-001</div>
+              </div>
+              <span className="badge badge-gold">SS 2 Arm Rep</span>
+            </div>
+
+            <div className="mobile-card-grid">
+              <div className="mobile-card-field full">
+                <span className="mobile-card-label">Enrolled Wards</span>
+                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '3px' }}>
+                  <span className="badge badge-primary">Daniel (SS 2A)</span>
+                  <span className="badge badge-primary">Kemi (JS 1B)</span>
+                </div>
+              </div>
+              <div className="mobile-card-field">
+                <span className="mobile-card-label">Phone</span>
+                <a href="tel:+2348031112233" className="mobile-card-value" style={{ color: 'var(--sky)' }}>
+                  +234 803 111 2233
+                </a>
+              </div>
+              <div className="mobile-card-field">
+                <span className="mobile-card-label">Email</span>
+                <a href="mailto:adeleke.family@domain.com" className="mobile-card-value" style={{ color: 'var(--sky)' }}>
+                  adeleke.family@domain.com
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div className="mobile-card">
+            <div className="mobile-card-head">
+              <div>
+                <h4 className="mobile-card-title">Chief & Mrs. O. Balogun</h4>
+                <div className="mobile-card-sub">Family ID: FAM-2026-002</div>
+              </div>
+              <span className="badge">Member</span>
+            </div>
+
+            <div className="mobile-card-grid">
+              <div className="mobile-card-field full">
+                <span className="mobile-card-label">Enrolled Wards</span>
+                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '3px' }}>
+                  <span className="badge badge-primary">Tobi (SS 2A)</span>
+                </div>
+              </div>
+              <div className="mobile-card-field">
+                <span className="mobile-card-label">Phone</span>
+                <a href="tel:+2348023334455" className="mobile-card-value" style={{ color: 'var(--sky)' }}>
+                  +234 802 333 4455
+                </a>
+              </div>
+              <div className="mobile-card-field">
+                <span className="mobile-card-label">Email</span>
+                <a href="mailto:balogun.holdings@domain.com" className="mobile-card-value" style={{ color: 'var(--sky)' }}>
+                  balogun.holdings@domain.com
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div className="mobile-card">
+            <div className="mobile-card-head">
+              <div>
+                <h4 className="mobile-card-title">Engr. & Dr. C. Okafor</h4>
+                <div className="mobile-card-sub">Family ID: FAM-2026-003</div>
+              </div>
+              <span className="badge">Member</span>
+            </div>
+
+            <div className="mobile-card-grid">
+              <div className="mobile-card-field full">
+                <span className="mobile-card-label">Enrolled Wards</span>
+                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '3px' }}>
+                  <span className="badge badge-primary">Somto (JS 2A)</span>
+                </div>
+              </div>
+              <div className="mobile-card-field">
+                <span className="mobile-card-label">Phone</span>
+                <a href="tel:+2348095556677" className="mobile-card-value" style={{ color: 'var(--sky)' }}>
+                  +234 809 555 6677
+                </a>
+              </div>
+              <div className="mobile-card-field">
+                <span className="mobile-card-label">Email</span>
+                <a href="mailto:chidi.okafor@primeeng.com" className="mobile-card-value" style={{ color: 'var(--sky)' }}>
+                  chidi.okafor@primeeng.com
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

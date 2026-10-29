@@ -204,7 +204,7 @@ export default function FeesView({
             <div style={{ fontSize: '12px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--muted)', marginBottom: '8px' }}>
               Select Class Level
             </div>
-            <div className="filter-chips-bar">
+            <div className="filter-chips-bar" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', overflowX: 'visible' }}>
               <button
                 className={`filter-chip ${selectedClass === 'all' ? 'active' : ''}`}
                 onClick={() => setSelectedClass('all')}
@@ -232,7 +232,7 @@ export default function FeesView({
               padding: '16px',
               marginBottom: '20px',
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))',
               gap: '12px',
               alignItems: 'end',
             }}
@@ -385,106 +385,197 @@ export default function FeesView({
                 </button>
               </div>
             ) : (
-              <div style={{ overflowX: 'auto' }}>
-                <table className="data-table">
-                  <thead>
-                    <tr>
-                      <th>Tariff Ref & Category</th>
-                      <th>Fee Item Title & Details</th>
-                      <th>Target Class</th>
-                      <th>Term</th>
-                      <th>Requirement</th>
-                      <th>Amount (₦)</th>
-                      <th>Due Date</th>
-                      <th style={{ textAlign: 'right' }}>Admin Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredFees.map((fee) => (
-                      <tr key={fee.id}>
-                        <td>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                            <span className={getCategoryClass(fee.category)}>
-                              {fee.category}
-                            </span>
-                            <small style={{ color: 'var(--muted)', fontSize: '11px', fontFamily: 'monospace' }}>
-                              {fee.id}
-                            </small>
-                          </div>
-                        </td>
-                        <td>
-                          <div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                              <strong>{fee.title}</strong>
-                              {fee.isCustom && (
-                                <span className="cat-badge cat-custom" style={{ fontSize: '10px' }}>
-                                  ✨ Custom Levy
-                                </span>
+              <>
+                {/* DESKTOP VIEW: Structured table on tablets/desktops (>= 769px) */}
+                <div className="desktop-only table-wrap">
+                  <table className="data-table">
+                    <thead>
+                      <tr>
+                        <th>Tariff Ref & Category</th>
+                        <th>Fee Item Title & Details</th>
+                        <th>Target Class</th>
+                        <th>Term</th>
+                        <th>Requirement</th>
+                        <th>Amount (₦)</th>
+                        <th>Due Date</th>
+                        <th style={{ textAlign: 'right' }}>Admin Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredFees.map((fee) => (
+                        <tr key={fee.id}>
+                          <td>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <span className={getCategoryClass(fee.category)}>
+                                {fee.category}
+                              </span>
+                              <small style={{ color: 'var(--muted)', fontSize: '11px', fontFamily: 'monospace' }}>
+                                {fee.id}
+                              </small>
+                            </div>
+                          </td>
+                          <td>
+                            <div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                                <strong>{fee.title}</strong>
+                                {fee.isCustom && (
+                                  <span className="cat-badge cat-custom" style={{ fontSize: '10px' }}>
+                                    ✨ Custom Levy
+                                  </span>
+                                )}
+                              </div>
+                              {fee.targetStudentName && (
+                                <div style={{ fontSize: '11.5px', color: 'var(--yellow)', marginTop: '2px' }}>
+                                  👤 Beneficiary: <strong>{fee.targetStudentName}</strong>
+                                </div>
+                              )}
+                              {fee.description && (
+                                <p style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '2px', maxWidth: '340px' }}>
+                                  {fee.description}
+                                </p>
                               )}
                             </div>
-                            {fee.targetStudentName && (
-                              <div style={{ fontSize: '11.5px', color: 'var(--yellow)', marginTop: '2px' }}>
-                                👤 Beneficiary: <strong>{fee.targetStudentName}</strong>
-                              </div>
+                          </td>
+                          <td>
+                            <span className="badge badge-primary">
+                              {fee.class}
+                            </span>
+                          </td>
+                          <td>
+                            <strong>{fee.term}</strong>
+                            <div style={{ fontSize: '11px', color: 'var(--muted)' }}>{fee.session}</div>
+                          </td>
+                          <td>
+                            {fee.type === 'Mandatory' ? (
+                              <span className="status green">Mandatory</span>
+                            ) : (
+                              <span className="status amber">Optional</span>
                             )}
-                            {fee.description && (
-                              <p style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '2px', maxWidth: '340px' }}>
-                                {fee.description}
-                              </p>
-                            )}
-                          </div>
-                        </td>
-                        <td>
-                          <span className="badge badge-primary">
-                            {fee.class}
+                          </td>
+                          <td>
+                            <div style={{ fontSize: '15px', fontWeight: '700', color: 'var(--ink)' }}>
+                              ₦{Number(fee.amount).toLocaleString('en-NG')}
+                            </div>
+                          </td>
+                          <td>
+                            <small style={{ color: 'var(--muted)' }}>{fee.dueDate}</small>
+                          </td>
+                          <td style={{ textAlign: 'right' }}>
+                            <div style={{ display: 'inline-flex', gap: '6px' }}>
+                              <button
+                                className="btn small"
+                                title="Modify Fee Item"
+                                onClick={() => onOpenEditFee(fee)}
+                              >
+                                ✏️ Edit
+                              </button>
+                              <button
+                                className="btn danger small"
+                                title="Remove Fee Item"
+                                onClick={() => {
+                                  if (window.confirm(`Are you sure you want to remove "${fee.title}" for ${fee.class}?`)) {
+                                    onDeleteFee(fee.id);
+                                  }
+                                }}
+                              >
+                                🗑️
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* MOBILE VIEW: Responsive Cards on phones (<= 768px, Zero Horizontal Scroll) */}
+                <div className="mobile-only mobile-cards-list" style={{ padding: '12px' }}>
+                  {filteredFees.map((fee) => (
+                    <div key={fee.id} className="mobile-card">
+                      <div className="mobile-card-head">
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                          <span className={getCategoryClass(fee.category)} style={{ alignSelf: 'flex-start' }}>
+                            {fee.category}
                           </span>
-                        </td>
-                        <td>
-                          <strong>{fee.term}</strong>
-                          <div style={{ fontSize: '11px', color: 'var(--muted)' }}>{fee.session}</div>
-                        </td>
-                        <td>
+                          <span style={{ fontSize: '10.5px', fontFamily: 'monospace', color: 'var(--muted)' }}>
+                            {fee.id}
+                          </span>
+                        </div>
+                        <div className="mobile-card-badge-row">
                           {fee.type === 'Mandatory' ? (
-                            <span className="status green">Mandatory</span>
+                            <span className="status green" style={{ fontSize: '11px' }}>Mandatory</span>
                           ) : (
-                            <span className="status amber">Optional</span>
+                            <span className="status amber" style={{ fontSize: '11px' }}>Optional</span>
                           )}
-                        </td>
-                        <td>
-                          <div style={{ fontSize: '15px', fontWeight: '700', color: 'var(--ink)' }}>
+                          {fee.isCustom && (
+                            <span className="cat-badge cat-custom" style={{ fontSize: '10px' }}>
+                              ✨ Custom
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      <div>
+                        <h4 className="mobile-card-title">{fee.title}</h4>
+                        {fee.targetStudentName && (
+                          <div style={{ fontSize: '12px', color: 'var(--yellow)', marginTop: '3px' }}>
+                            👤 Beneficiary: <strong>{fee.targetStudentName}</strong>
+                          </div>
+                        )}
+                        {fee.description && (
+                          <p style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '4px', lineHeight: '1.4' }}>
+                            {fee.description}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="mobile-card-grid">
+                        <div className="mobile-card-field">
+                          <span className="mobile-card-label">Target Class</span>
+                          <span className="mobile-card-value">
+                            <span className="badge badge-primary">{fee.class}</span>
+                          </span>
+                        </div>
+                        <div className="mobile-card-field">
+                          <span className="mobile-card-label">Academic Term</span>
+                          <span className="mobile-card-value">{fee.term}</span>
+                        </div>
+                        <div className="mobile-card-field">
+                          <span className="mobile-card-label">Tariff Amount</span>
+                          <span className="mobile-card-value" style={{ color: 'var(--gold-400)', fontSize: '14.5px', fontWeight: '800' }}>
                             ₦{Number(fee.amount).toLocaleString('en-NG')}
-                          </div>
-                        </td>
-                        <td>
-                          <small style={{ color: 'var(--muted)' }}>{fee.dueDate}</small>
-                        </td>
-                        <td style={{ textAlign: 'right' }}>
-                          <div style={{ display: 'inline-flex', gap: '6px' }}>
-                            <button
-                              className="btn small"
-                              title="Modify Fee Item"
-                              onClick={() => onOpenEditFee(fee)}
-                            >
-                              ✏️ Edit
-                            </button>
-                            <button
-                              className="btn danger small"
-                              title="Remove Fee Item"
-                              onClick={() => {
-                                if (window.confirm(`Are you sure you want to remove "${fee.title}" for ${fee.class}?`)) {
-                                  onDeleteFee(fee.id);
-                                }
-                              }}
-                            >
-                              🗑️
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                          </span>
+                        </div>
+                        <div className="mobile-card-field">
+                          <span className="mobile-card-label">Due Date</span>
+                          <span className="mobile-card-value" style={{ color: 'var(--muted)', fontSize: '12px' }}>
+                            {fee.dueDate}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="mobile-card-actions">
+                        <button
+                          className="btn small"
+                          onClick={() => onOpenEditFee(fee)}
+                        >
+                          ✏️ Edit Fee
+                        </button>
+                        <button
+                          className="btn danger small"
+                          onClick={() => {
+                            if (window.confirm(`Are you sure you want to remove "${fee.title}" for ${fee.class}?`)) {
+                              onDeleteFee(fee.id);
+                            }
+                          }}
+                        >
+                          🗑️ Remove
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
             )}
           </div>
         </div>
@@ -537,7 +628,8 @@ export default function FeesView({
               </button>
             </div>
 
-            <div style={{ overflowX: 'auto' }}>
+            {/* DESKTOP VIEW: Ledger Table for tablets/desktops (>= 769px) */}
+            <div className="desktop-only table-wrap">
               <table className="data-table">
                 <thead>
                   <tr>
@@ -591,6 +683,65 @@ export default function FeesView({
                 </tbody>
               </table>
             </div>
+
+            {/* MOBILE VIEW: Responsive Cards for phones (<= 768px, Zero Horizontal Scroll) */}
+            <div className="mobile-only mobile-cards-list" style={{ padding: '12px' }}>
+              {paymentsList.map((payment) => (
+                <div key={payment.id} className="mobile-card">
+                  <div className="mobile-card-head">
+                    <div>
+                      <strong style={{ fontSize: '13.5px', fontFamily: 'monospace', color: 'var(--yellow)' }}>
+                        {payment.id}
+                      </strong>
+                      <div className="mobile-card-sub">{payment.date}</div>
+                    </div>
+                    <div className="mobile-card-badge-row">
+                      {payment.status === 'Verified' || payment.status === 'Paid' ? (
+                        <span className="badge badge-success" style={{ fontSize: '11px' }}>Settled ✓</span>
+                      ) : (
+                        <span className="badge badge-gold" style={{ fontSize: '11px' }}>Pending</span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="mobile-card-title">{payment.title}</h4>
+                    <div style={{ fontSize: '12.5px', color: 'var(--sky)', marginTop: '2px', fontWeight: '600' }}>
+                      👤 {payment.student || payment.name}
+                    </div>
+                  </div>
+
+                  <div className="mobile-card-grid">
+                    <div className="mobile-card-field">
+                      <span className="mobile-card-label">Class & Term</span>
+                      <span className="mobile-card-value">
+                        {payment.class || 'SS2'} · {payment.term || '1st Term'}
+                      </span>
+                    </div>
+                    <div className="mobile-card-field">
+                      <span className="mobile-card-label">Payer / Sponsor</span>
+                      <span className="mobile-card-value">{payment.parent || 'Guardian'}</span>
+                    </div>
+                    <div className="mobile-card-field full">
+                      <span className="mobile-card-label">Amount Paid</span>
+                      <span className="mobile-card-value" style={{ color: '#10b981', fontSize: '16px', fontWeight: '800' }}>
+                        {payment.amount}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="mobile-card-actions">
+                    <button
+                      className="btn secondary small"
+                      style={{ width: '100%' }}
+                      onClick={() => onOpenReceipt(payment)}
+                    >
+                      Inspect Official Receipt 🧾
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}
@@ -642,7 +793,7 @@ export default function FeesView({
           </div>
 
           {/* Child Fee Breakdown & Receipts Grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '20px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '20px' }}>
             {/* Itemized Fee Schedule */}
             <div className="panel">
               <div className="panel-head">
@@ -663,11 +814,13 @@ export default function FeesView({
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
+                      flexWrap: 'wrap',
+                      gap: '8px',
                       padding: '12px 18px',
                       borderBottom: idx < (currentChild?.feeBreakdown?.length - 1) ? '1px solid var(--line)' : 'none',
                     }}
                   >
-                    <div>
+                    <div style={{ minWidth: 0, flex: '1 1 180px' }}>
                       <strong style={{ fontSize: '13.5px' }}>{fee.title}</strong>
                       <div style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '2px' }}>
                         {fee.sub || fee.description || 'Mandatory academic component'}
@@ -703,11 +856,13 @@ export default function FeesView({
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
+                        flexWrap: 'wrap',
+                        gap: '10px',
                         padding: '12px 18px',
                         borderBottom: '1px solid var(--line)',
                       }}
                     >
-                      <div>
+                      <div style={{ minWidth: 0, flex: '1 1 180px' }}>
                         <strong>{payment.id}</strong> · <small>{payment.date}</small>
                         <div style={{ fontSize: '12px', color: 'var(--muted)' }}>
                           {payment.title} ({payment.method})

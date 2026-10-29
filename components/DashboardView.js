@@ -207,7 +207,8 @@ export default function DashboardView({
                 </div>
               </div>
             </div>
-            <div className="table-wrap">
+            {/* DESKTOP VIEW: Academic Progress Table (>= 769px) */}
+            <div className="desktop-only table-wrap">
               <table className="data-table">
                 <thead>
                   <tr>
@@ -236,6 +237,38 @@ export default function DashboardView({
                   ))}
                 </tbody>
               </table>
+            </div>
+
+            {/* MOBILE VIEW: Academic Progress Cards (<= 768px, Zero Horizontal Scroll) */}
+            <div className="mobile-only mobile-cards-list" style={{ padding: '4px 0 10px' }}>
+              {normalizedActiveScores.map((sc, i) => (
+                <div key={i} className="mobile-card" style={{ padding: '12px 14px' }}>
+                  <div className="mobile-card-head">
+                    <h4 className="mobile-card-title">{sc.subject}</h4>
+                    <span className={`badge ${sc.grade.startsWith('A') ? 'badge-success' : 'badge-primary'}`}>
+                      Grade {sc.grade}
+                    </span>
+                  </div>
+                  <div className="mobile-score-chips">
+                    <div>
+                      <div className="mobile-score-chip-label">CA 1</div>
+                      <div className="mobile-score-chip-val">{sc.ca1}</div>
+                    </div>
+                    <div>
+                      <div className="mobile-score-chip-label">CA 2</div>
+                      <div className="mobile-score-chip-val">{sc.ca2}</div>
+                    </div>
+                    <div>
+                      <div className="mobile-score-chip-label">Exam</div>
+                      <div className="mobile-score-chip-val">{sc.exam}</div>
+                    </div>
+                    <div style={{ background: 'rgba(255, 194, 26, 0.12)', borderRadius: '6px' }}>
+                      <div className="mobile-score-chip-label" style={{ color: 'var(--yellow)' }}>Total</div>
+                      <div className="mobile-score-chip-val" style={{ color: 'var(--yellow)' }}>{sc.total}%</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -422,7 +455,8 @@ export default function DashboardView({
                 </div>
               </div>
             </div>
-            <div className="table-wrap">
+            {/* DESKTOP VIEW: Schedule Table (>= 769px) */}
+            <div className="desktop-only table-wrap">
               <table className="data-table">
                 <thead>
                   <tr>
@@ -457,6 +491,54 @@ export default function DashboardView({
                   </tr>
                 </tbody>
               </table>
+            </div>
+
+            {/* MOBILE VIEW: Schedule Cards (<= 768px, Zero Horizontal Scroll) */}
+            <div className="mobile-only mobile-cards-list" style={{ padding: '4px 0 10px' }}>
+              <div className="mobile-card">
+                <div className="mobile-card-head">
+                  <div>
+                    <h4 className="mobile-card-title">SS 2A · Chemistry</h4>
+                    <div className="mobile-card-sub">32 Enrolled Scholars</div>
+                  </div>
+                  <span className="badge badge-gold">Form Teacher + Specialist</span>
+                </div>
+                <div className="mobile-card-actions">
+                  <button className="btn small secondary" style={{ width: '100%' }} onClick={() => onNavigate('academics')}>
+                    Enter CA & Exam Scores →
+                  </button>
+                </div>
+              </div>
+
+              <div className="mobile-card">
+                <div className="mobile-card-head">
+                  <div>
+                    <h4 className="mobile-card-title">SS 2B · Chemistry</h4>
+                    <div className="mobile-card-sub">30 Enrolled Scholars</div>
+                  </div>
+                  <span className="badge badge-primary">Subject Specialist</span>
+                </div>
+                <div className="mobile-card-actions">
+                  <button className="btn small secondary" style={{ width: '100%' }} onClick={() => onNavigate('academics')}>
+                    Enter CA & Exam Scores →
+                  </button>
+                </div>
+              </div>
+
+              <div className="mobile-card">
+                <div className="mobile-card-head">
+                  <div>
+                    <h4 className="mobile-card-title">SS 3 Science · Adv. Chemistry</h4>
+                    <div className="mobile-card-sub">28 Enrolled Scholars</div>
+                  </div>
+                  <span className="badge badge-primary">Subject Specialist</span>
+                </div>
+                <div className="mobile-card-actions">
+                  <button className="btn small secondary" style={{ width: '100%' }} onClick={() => onNavigate('academics')}>
+                    Enter CA & Exam Scores →
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 

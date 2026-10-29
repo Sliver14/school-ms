@@ -82,7 +82,8 @@ export default function AcademicsView({
           )}
         </div>
 
-        <div style={{ overflowX: 'auto' }}>
+        {/* DESKTOP VIEW: Gradebook Table (>= 769px) */}
+        <div className="desktop-only table-wrap">
           <table className="data-table">
             <thead>
               <tr>
@@ -123,6 +124,54 @@ export default function AcademicsView({
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* MOBILE VIEW: Responsive Grade Cards (<= 768px, Zero Horizontal Scroll) */}
+        <div className="mobile-only mobile-cards-list" style={{ padding: '12px' }}>
+          {scores.map((sc, idx) => (
+            <div key={idx} className="mobile-card">
+              <div className="mobile-card-head">
+                <h4 className="mobile-card-title">{sc.subject}</h4>
+                <div className="mobile-card-badge-row">
+                  <span
+                    className={`badge ${
+                      sc.grade.startsWith('A')
+                        ? 'badge-success'
+                        : 'badge-primary'
+                    }`}
+                  >
+                    Grade {sc.grade}
+                  </span>
+                </div>
+              </div>
+
+              <div className="mobile-score-chips">
+                <div>
+                  <div className="mobile-score-chip-label">CA 1 (20)</div>
+                  <div className="mobile-score-chip-val">{sc.ca1}</div>
+                </div>
+                <div>
+                  <div className="mobile-score-chip-label">CA 2 (20)</div>
+                  <div className="mobile-score-chip-val">{sc.ca2}</div>
+                </div>
+                <div>
+                  <div className="mobile-score-chip-label">Exam (60)</div>
+                  <div className="mobile-score-chip-val">{sc.exam}</div>
+                </div>
+                <div style={{ background: 'rgba(255, 194, 26, 0.12)', borderRadius: '6px' }}>
+                  <div className="mobile-score-chip-label" style={{ color: 'var(--yellow)' }}>Total</div>
+                  <div className="mobile-score-chip-val" style={{ color: 'var(--yellow)' }}>{sc.total}%</div>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px', color: 'var(--muted)', marginTop: '2px' }}>
+                <span>Faculty Remark:</span>
+                <span style={{ color: 'var(--ink)', fontWeight: '600' }}>
+                  {sc.remark || (sc.total >= 85 ? 'Distinction' : 'Very Good')}
+                </span>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

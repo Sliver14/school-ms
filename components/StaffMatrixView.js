@@ -3,7 +3,7 @@ import { useState } from 'react';
 
 export default function StaffMatrixView({
   classAllocations,
-  allTeachersList,
+  allTeachersList = [],
   onOpenAllocationModal,
   onOpenOnboardTeacher,
   showToast,
@@ -34,7 +34,7 @@ export default function StaffMatrixView({
             Manage homeroom class teachers and individual specialist subject allocations across classes.
           </p>
         </div>
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
           <button
             className="btn secondary"
             onClick={() => showToast('Onboarding documentation downloaded (PDF)')}
@@ -82,7 +82,7 @@ export default function StaffMatrixView({
       </div>
 
       {/* Class Level Filters */}
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', alignItems: 'center' }}>
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
         <span style={{ fontSize: '13px', fontWeight: '600', color: 'var(--muted)' }}>Filter Level:</span>
         {['ALL', 'Junior Secondary', 'Senior Secondary'].map((lvl) => (
           <button
@@ -95,9 +95,9 @@ export default function StaffMatrixView({
         ))}
       </div>
 
-      {/* Subject-Class Allocation Matrix Table */}
-      <div className="panel" style={{ marginBottom: '24px' }}>
-        <div className="panel-head">
+      {/* Subject-Class Allocation Matrix Panel */}
+      <div className="panel" style={{ marginBottom: '24px', padding: 0 }}>
+        <div className="panel-head" style={{ padding: '20px 20px 0' }}>
           <div className="panel-title">
             <div className="panel-icon">🏛️</div>
             <div>
@@ -107,7 +107,8 @@ export default function StaffMatrixView({
           </div>
         </div>
 
-        <div style={{ overflowX: 'auto' }}>
+        {/* DESKTOP VIEW: Allocation Table for tablet/desktop (>= 769px) */}
+        <div className="desktop-only table-wrap" style={{ margin: 0, padding: '0 4px 14px' }}>
           <table className="data-table">
             <thead>
               <tr>
@@ -182,6 +183,105 @@ export default function StaffMatrixView({
             </tbody>
           </table>
         </div>
+
+        {/* MOBILE VIEW: Responsive Cards for mobile phones (<= 768px, Zero Horizontal Scroll) */}
+        <div className="mobile-only mobile-cards-list" style={{ padding: '14px' }}>
+          {filteredAllocations.map((cls) => {
+            const subjectEntries = Array.isArray(cls.subjects)
+              ? cls.subjects.map((s) => [s.subject, s.teacher])
+              : Object.entries(cls.subjects || {});
+
+            const formTeacherInitials = (cls.formTeacher || 'FT')
+              .split(' ')
+              .map((w) => w[0])
+              .join('')
+              .slice(0, 2);
+
+            return (
+              <div key={cls.id} className="mobile-card">
+                <div className="mobile-card-head">
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: '17px', color: 'var(--ink)' }}>{cls.name}</h3>
+                    <div style={{ fontSize: '11.5px', color: 'var(--muted)', marginTop: '2px' }}>
+                      Senior & Junior Arms
+                    </div>
+                  </div>
+                  <span className="badge badge-primary">{cls.level}</span>
+                </div>
+
+                {/* Form Teacher Box */}
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    background: 'rgba(0, 0, 0, 0.22)',
+                    padding: '10px 12px',
+                    borderRadius: '12px',
+                    border: '1px solid rgba(255, 255, 255, 0.05)',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '34px',
+                      height: '34px',
+                      borderRadius: '50%',
+                      background: 'var(--primary-soft)',
+                      color: 'var(--primary-text)',
+                      display: 'grid',
+                      placeItems: 'center',
+                      fontWeight: '800',
+                      fontSize: '12px',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {formTeacherInitials}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '10.5px', textTransform: 'uppercase', color: 'var(--muted)', fontWeight: '700' }}>
+                      Form Teacher (Pastoral Oversight)
+                    </div>
+                    <strong style={{ fontSize: '13.5px', color: 'var(--ink)' }}>{cls.formTeacher}</strong>
+                  </div>
+                </div>
+
+                {/* Subject Specialists Section */}
+                <div>
+                  <div
+                    style={{
+                      fontSize: '11px',
+                      fontWeight: '700',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px',
+                      color: 'var(--muted)',
+                      marginBottom: '6px',
+                    }}
+                  >
+                    Subject Specialists Assigned ({subjectEntries.length} Subjects)
+                  </div>
+                  <div className="mobile-subject-tags">
+                    {subjectEntries.map(([subj, teacher]) => (
+                      <div className="mobile-subject-pill" key={subj}>
+                        <span className="subj-name">{subj}:</span>
+                        <span className="subj-teacher">{teacher}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mobile-card-actions">
+                  <button
+                    className="btn secondary small"
+                    style={{ width: '100%' }}
+                    onClick={() => onOpenAllocationModal(cls)}
+                  >
+                    ⚙️ Edit Class Allocations
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Staff Directory Cards */}
@@ -196,7 +296,7 @@ export default function StaffMatrixView({
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 250px), 1fr))', gap: '16px' }}>
           {allTeachersList.map((teacher) => (
             <div
               key={teacher.id}
@@ -219,6 +319,7 @@ export default function StaffMatrixView({
                     placeItems: 'center',
                     fontWeight: '700',
                     fontSize: '14px',
+                    flexShrink: 0,
                   }}
                 >
                   {teacher.name
@@ -227,8 +328,10 @@ export default function StaffMatrixView({
                     .join('')
                     .slice(0, 2)}
                 </div>
-                <div>
-                  <h5 style={{ margin: 0, fontSize: '14px' }}>{teacher.name}</h5>
+                <div style={{ minWidth: 0 }}>
+                  <h5 style={{ margin: 0, fontSize: '14px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {teacher.name}
+                  </h5>
                   <div style={{ fontSize: '12px', color: 'var(--muted)' }}>{teacher.role}</div>
                 </div>
               </div>

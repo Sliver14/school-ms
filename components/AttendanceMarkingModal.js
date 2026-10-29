@@ -168,7 +168,7 @@ export default function AttendanceMarkingModal({
           </div>
 
           {/* Students Roll Call Table */}
-          <div style={{ maxHeight: '340px', overflowY: 'auto', border: '1px solid var(--line)', borderRadius: 'var(--radius)' }}>
+          <div style={{ maxHeight: '340px', overflow: 'auto', maxWidth: '100%', border: '1px solid var(--line)', borderRadius: 'var(--radius)' }}>
             <table className="data-table" style={{ margin: 0 }}>
               <thead>
                 <tr>
