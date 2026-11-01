@@ -251,7 +251,7 @@ const CSS = `
 }
 `;
 
-export default function LandingPage({ onOpenFastAdmission }) {
+export default function LandingPage({ onOpenFastAdmission, onOpenResultChecker }) {
   const router = useRouter();
 
   // Interactive Activity Category Filter State
@@ -596,6 +596,18 @@ export default function LandingPage({ onOpenFastAdmission }) {
             ))}
           </nav>
           <div className="rh-actions">
+            <button
+              className="rh-btn sm"
+              style={{
+                background: 'rgba(234, 179, 8, 0.15)',
+                color: '#eab308',
+                border: '1px solid rgba(234, 179, 8, 0.35)',
+                fontWeight: 700,
+              }}
+              onClick={onOpenResultChecker}
+            >
+              🎫 Check Result
+            </button>
             <button className="rh-btn dark sm" onClick={onOpenFastAdmission}>Apply</button>
             <button className="rh-btn yellow sm" onClick={() => router.push('/login')}>Sign in</button>
             <button
@@ -667,6 +679,22 @@ export default function LandingPage({ onOpenFastAdmission }) {
         </nav>
 
         <div className="rh-mobile-drawer-actions">
+          <button
+            className="rh-btn lg"
+            style={{
+              width: '100%',
+              background: 'rgba(234, 179, 8, 0.15)',
+              color: '#eab308',
+              border: '1px solid rgba(234, 179, 8, 0.4)',
+              fontWeight: 700,
+            }}
+            onClick={() => {
+              setIsMobileNavOpen(false);
+              if (onOpenResultChecker) onOpenResultChecker();
+            }}
+          >
+            🎫 Check Terminal Result (Scratch Card)
+          </button>
           <button
             className="rh-btn sky lg"
             style={{ width: '100%' }}

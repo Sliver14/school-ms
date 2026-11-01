@@ -4,10 +4,12 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import LandingPage from '../components/LandingPage';
 import FastAdmissionModal from '../components/FastAdmissionModal';
+import PublicResultCheckerModal from '../components/PublicResultCheckerModal';
 
 export default function HomePage() {
   const router = useRouter();
   const [isFastAdmissionOpen, setIsFastAdmissionOpen] = useState(false);
+  const [isResultCheckerOpen, setIsResultCheckerOpen] = useState(false);
   const [toast, setToast] = useState({ visible: false, message: '' });
 
   const showToast = (message) => {
@@ -38,6 +40,7 @@ export default function HomePage() {
       <LandingPage
         onEnterPortal={handleEnterPortal}
         onOpenFastAdmission={() => setIsFastAdmissionOpen(true)}
+        onOpenResultChecker={() => setIsResultCheckerOpen(true)}
       />
 
       {/* ADMISSION APPLICATION MODAL */}
@@ -45,6 +48,13 @@ export default function HomePage() {
         isOpen={isFastAdmissionOpen}
         onClose={() => setIsFastAdmissionOpen(false)}
         onSubmit={handleFastAdmissionSubmit}
+      />
+
+      {/* PUBLIC SCRATCH CARD RESULT CHECKER MODAL */}
+      <PublicResultCheckerModal
+        isOpen={isResultCheckerOpen}
+        onClose={() => setIsResultCheckerOpen(false)}
+        showToast={showToast}
       />
 
       {/* TOAST NOTIFICATION */}

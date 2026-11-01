@@ -8,13 +8,19 @@ export default function AcademicsView({
   onOpenReportCard,
   onOpenScoreEntry,
   gradesList = [],
+  unlockedCards = {},
   showToast,
 }) {
   const isParent = role === 'parent';
+  const isStudent = role === 'student';
+  const isProtectedRole = isParent || isStudent;
   const activeChild =
     isParent && activeChildIndex >= 0
       ? parentChildren[activeChildIndex]
       : parentChildren[0];
+
+  const studentId = activeChild.id || activeChild.admissionNo;
+  const isUnlocked = !isProtectedRole || !!unlockedCards[studentId];
 
   const rawScores = (gradesList && gradesList.length > 0)
     ? gradesList
@@ -45,7 +51,7 @@ export default function AcademicsView({
               : 'Continuous Assessment (CA), practicals, and term examination recording'}
           </p>
         </div>
-        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
           {(role === 'teacher' || role === 'admin') && (
             <button
               className="btn primary"
@@ -54,11 +60,29 @@ export default function AcademicsView({
               ✍️ + Enter CA & Exam Marks
             </button>
           )}
+          {isProtectedRole && (
+            <span
+              style={{
+                fontSize: '12px',
+                padding: '5px 12px',
+                borderRadius: '20px',
+                background: isUnlocked ? 'rgba(16, 185, 129, 0.12)' : 'rgba(234, 179, 8, 0.12)',
+                border: isUnlocked ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid rgba(234, 179, 8, 0.3)',
+                color: isUnlocked ? '#10b981' : 'var(--yellow)',
+                fontWeight: 600,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              {isUnlocked ? '✓ Scratch Card Verified' : '🔒 Card PIN Required'}
+            </span>
+          )}
           <button
-            className="btn gold"
+            className={`btn ${isUnlocked ? 'gold' : 'secondary'}`}
             onClick={() => onOpenReportCard(activeChild)}
           >
-            📜 View Official Report Card
+            {isUnlocked ? '📜 View Official Report Card' : '🔓 Unlock Report Card'}
           </button>
         </div>
       </div>

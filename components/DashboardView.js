@@ -8,10 +8,13 @@ export default function DashboardView({
   onOpenReportCard,
   onOpenFastAdmission,
   onNavigate,
+  unlockedCards = {},
   showToast,
 }) {
   const activeChild =
     activeChildIndex >= 0 ? parentChildren[activeChildIndex] : parentChildren[0];
+  const childId = activeChild?.id || activeChild?.admissionNo;
+  const isChildUnlocked = role === 'admin' || role === 'teacher' || role === 'bursar' || !!unlockedCards[childId];
 
   const getChildFormTeacher = (c) => c?.formTeacher || c?.classTeacher || 'Mr. Samuel Okoro';
   const getChildGPA = (c) => c?.gpa || (c?.average ? (c.average / 25).toFixed(2) : '3.88');
@@ -161,13 +164,28 @@ export default function DashboardView({
         {/* Child Hero Banner */}
         <div className="parent-banner" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
           <div>
-            <h3>{activeChild.name}</h3>
-            <p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <h3 style={{ margin: 0 }}>{activeChild.name}</h3>
+              <span
+                style={{
+                  fontSize: '11px',
+                  padding: '3px 9px',
+                  borderRadius: '12px',
+                  background: isChildUnlocked ? 'rgba(16, 185, 129, 0.15)' : 'rgba(234, 179, 8, 0.15)',
+                  color: isChildUnlocked ? '#10b981' : 'var(--yellow)',
+                  border: isChildUnlocked ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid rgba(234, 179, 8, 0.3)',
+                  fontWeight: 600,
+                }}
+              >
+                {isChildUnlocked ? '✓ Scratch Card Verified' : '🔒 Card Required'}
+              </span>
+            </div>
+            <p style={{ marginTop: '4px' }}>
               Class: <strong>{activeChild.class}</strong> • Form Teacher: <strong>{getChildFormTeacher(activeChild)}</strong> • Admission ID: <strong>{activeChild.id}</strong>
             </p>
           </div>
-          <button className="btn gold" onClick={() => onOpenReportCard(activeChild)}>
-            📜 Download Term Report Card
+          <button className={`btn ${isChildUnlocked ? 'gold' : 'secondary'}`} onClick={() => onOpenReportCard(activeChild)}>
+            {isChildUnlocked ? '📜 Download Term Report Card' : '🔓 Unlock Report Card (Card PIN)'}
           </button>
         </div>
 
@@ -308,11 +326,26 @@ export default function DashboardView({
       <div>
         <div className="page-head">
           <div>
-            <h2>Welcome back, Daniel! 🎒</h2>
-            <p>Senior Secondary 2A (Science) • House: Windsor • Term 1</p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <h2 style={{ margin: 0 }}>Welcome back, Daniel! 🎒</h2>
+              <span
+                style={{
+                  fontSize: '11.5px',
+                  padding: '3px 10px',
+                  borderRadius: '12px',
+                  background: isChildUnlocked ? 'rgba(16, 185, 129, 0.15)' : 'rgba(234, 179, 8, 0.15)',
+                  color: isChildUnlocked ? '#10b981' : 'var(--yellow)',
+                  border: isChildUnlocked ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid rgba(234, 179, 8, 0.3)',
+                  fontWeight: 600,
+                }}
+              >
+                {isChildUnlocked ? '✓ Scratch Card Verified' : '🔒 Card Required'}
+              </span>
+            </div>
+            <p style={{ marginTop: '4px' }}>Senior Secondary 2A (Science) • House: Windsor • Term 1</p>
           </div>
-          <button className="btn gold" onClick={() => onOpenReportCard(activeChild)}>
-            📜 View My Term Report
+          <button className={`btn ${isChildUnlocked ? 'gold' : 'secondary'}`} onClick={() => onOpenReportCard(activeChild)}>
+            {isChildUnlocked ? '📜 View My Term Report' : '🔓 Unlock Term Report Card'}
           </button>
         </div>
 

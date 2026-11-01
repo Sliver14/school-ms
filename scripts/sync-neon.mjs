@@ -194,6 +194,27 @@ async function run() {
     `;
     console.log('✓ rh_class_allocations table ready');
 
+    await sql`
+      CREATE TABLE IF NOT EXISTS rh_scratch_cards (
+        id VARCHAR(60) PRIMARY KEY,
+        serial_number VARCHAR(50) UNIQUE NOT NULL,
+        pin VARCHAR(50) NOT NULL,
+        session VARCHAR(30) NOT NULL,
+        term VARCHAR(30) NOT NULL,
+        price NUMERIC DEFAULT 2000,
+        max_uses INT DEFAULT 5,
+        used_count INT DEFAULT 0,
+        student_id VARCHAR(50),
+        student_name VARCHAR(150),
+        status VARCHAR(30) DEFAULT 'Active',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        expires_at VARCHAR(50),
+        last_used_at VARCHAR(50),
+        batch_code VARCHAR(50)
+      );
+    `;
+    console.log('✓ rh_scratch_cards table ready');
+
     // 2. Read local db.json
     const dbJsonPath = path.join(process.cwd(), 'data', 'db.json');
     if (!fs.existsSync(dbJsonPath)) {
@@ -499,6 +520,32 @@ async function run() {
       console.log(`✓ Synchronized ${keys.length} class allocations.`);
     }
 
+    // Sync Scratch Cards
+    if (Array.isArray(db.scratchCards)) {
+      console.log(`Syncing ${db.scratchCards.length} scratch cards...`);
+      for (const sc of db.scratchCards) {
+        await sql`
+          INSERT INTO rh_scratch_cards (
+            id, serial_number, pin, session, term, price, max_uses, used_count,
+            student_id, student_name, status, created_at, expires_at, last_used_at, batch_code
+          ) VALUES (
+            ${sc.id}, ${sc.serialNumber}, ${sc.pin}, ${sc.session}, ${sc.term},
+            ${sc.price || 2000}, ${sc.maxUses || 5}, ${sc.usedCount || 0},
+            ${sc.studentId || null}, ${sc.studentName || null}, ${sc.status || 'Active'},
+            ${sc.createdAt || new Date().toISOString()}, ${sc.expiresAt || null},
+            ${sc.lastUsedAt || null}, ${sc.batchCode || 'BATCH-2026-T1'}
+          )
+          ON CONFLICT (serial_number) DO UPDATE SET
+            status = EXCLUDED.status,
+            used_count = EXCLUDED.used_count,
+            student_id = EXCLUDED.student_id,
+            student_name = EXCLUDED.student_name,
+            last_used_at = EXCLUDED.last_used_at;
+        `;
+      }
+      console.log(`✓ Synchronized ${db.scratchCards.length} scratch cards.`);
+    }
+
     // Verification Counts
     console.log('\n--- Final Database Table Counts in Neon Postgres ---');
     const [uCount] = await sql`SELECT COUNT(*) as count FROM rh_users;`;
@@ -510,6 +557,7 @@ async function run() {
     const [gCount] = await sql`SELECT COUNT(*) as count FROM rh_grades;`;
     const [tCount] = await sql`SELECT COUNT(*) as count FROM rh_teachers;`;
     const [cCount] = await sql`SELECT COUNT(*) as count FROM rh_class_allocations;`;
+    const [scCount] = await sql`SELECT COUNT(*) as count FROM rh_scratch_cards;`;
 
     console.log(`- rh_users: ${uCount.count}`);
     console.log(`- rh_admissions: ${aCount.count}`);
@@ -520,6 +568,7 @@ async function run() {
     console.log(`- rh_grades: ${gCount.count}`);
     console.log(`- rh_teachers: ${tCount.count}`);
     console.log(`- rh_class_allocations: ${cCount.count}`);
+    console.log(`- rh_scratch_cards: ${scCount.count}`);
 
     console.log('\n🚀 Neon Postgres database sync complete and all data verified!');
   } catch (err) {

@@ -21,6 +21,7 @@ import {
 } from '../../components/OtherViews';
 import FastAdmissionModal from '../../components/FastAdmissionModal';
 import ReportCardModal from '../../components/ReportCardModal';
+import ScratchCardsView from '../../components/ScratchCardsView';
 import SubjectAllocationModal from '../../components/SubjectAllocationModal';
 import ReceiptModal from '../../components/ReceiptModal';
 import AddStudentModal from '../../components/AddStudentModal';
@@ -97,6 +98,31 @@ function PortalContent() {
   const [isCredentialSlipOpen, setIsCredentialSlipOpen] = useState(false);
   const [credentialSlipData, setCredentialSlipData] = useState(null);
   const [teachersList, setTeachersList] = useState(allTeachersList);
+
+  // Scratch Card Unlocked Sessions State
+  const [unlockedCards, setUnlockedCards] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = sessionStorage.getItem('rh_unlocked_cards');
+        return stored ? JSON.parse(stored) : {};
+      } catch (_) {
+        return {};
+      }
+    }
+    return {};
+  });
+
+  const handleUnlockCard = (studentId, cardData) => {
+    setUnlockedCards((prev) => {
+      const updated = { ...prev, [studentId]: cardData };
+      if (typeof window !== 'undefined') {
+        try {
+          sessionStorage.setItem('rh_unlocked_cards', JSON.stringify(updated));
+        } catch (_) {}
+      }
+      return updated;
+    });
+  };
 
   // Toast State
   const [toast, setToast] = useState({ visible: false, message: '' });
@@ -573,6 +599,7 @@ function PortalContent() {
               onOpenReportCard={handleOpenReportCard}
               onOpenFastAdmission={() => setIsFastAdmissionOpen(true)}
               onNavigate={handleNavigate}
+              unlockedCards={unlockedCards}
               showToast={showToast}
             />
           )}
@@ -585,6 +612,7 @@ function PortalContent() {
               onOpenReportCard={handleOpenReportCard}
               onOpenScoreEntry={handleOpenScoreEntry}
               gradesList={gradesList}
+              unlockedCards={unlockedCards}
               showToast={showToast}
             />
           )}
@@ -651,6 +679,10 @@ function PortalContent() {
 
           {activePage === 'parents' && <ParentsModule />}
 
+          {activePage === 'scratch-cards' && (
+            <ScratchCardsView showToast={showToast} />
+          )}
+
           {activePage === 'communications' && (
             <CommunicationsModule showToast={showToast} />
           )}
@@ -713,6 +745,9 @@ function PortalContent() {
           setReportCardChild(parentChildrenState[idx]);
         }}
         isParent={role === 'parent'}
+        role={role}
+        unlockedCards={unlockedCards}
+        onUnlockCard={handleUnlockCard}
         showToast={showToast}
       />
 

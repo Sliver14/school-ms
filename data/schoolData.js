@@ -483,12 +483,13 @@ export const ROLE_PERMISSIONS = {
     name: 'School Administrator',
     sub: 'Full Governance & Settings',
     avatar: 'AD',
-    tabs: ['dashboard', 'students', 'academics', 'timetable', 'attendance', 'admissions', 'fees', 'parents', 'communications', 'staff', 'reports', 'settings'],
+    tabs: ['dashboard', 'students', 'academics', 'timetable', 'attendance', 'admissions', 'fees', 'parents', 'scratch-cards', 'communications', 'staff', 'reports', 'settings'],
     tabLabels: {
       academics: 'Academics & Results',
       timetable: 'Timetable',
       attendance: 'Attendance',
-      fees: 'Fees & Payments'
+      fees: 'Fees & Payments',
+      'scratch-cards': 'Scratch Cards'
     }
   },
   teacher: {
@@ -531,12 +532,13 @@ export const ROLE_PERMISSIONS = {
     name: 'Accounts Office',
     sub: 'Tuition & Invoicing Desk',
     avatar: 'AC',
-    tabs: ['dashboard', 'students', 'fees', 'admissions', 'communications', 'reports'],
+    tabs: ['dashboard', 'students', 'fees', 'scratch-cards', 'admissions', 'communications', 'reports'],
     tabLabels: {
       academics: 'Academics',
       timetable: 'Timetable',
       attendance: 'Attendance',
-      fees: 'Fees & Collections'
+      fees: 'Fees & Collections',
+      'scratch-cards': 'Scratch Cards'
     }
   }
 };
@@ -735,5 +737,6 @@ export const pageNames = {
   communications: 'School Communications',
   staff: 'Staff & Subjects',
   reports: 'Reports & Analytics',
+  'scratch-cards': 'Scratch Card Management',
   settings: 'Settings & Security'
 };
